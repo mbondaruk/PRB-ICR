@@ -37,15 +37,15 @@
 /*-------------------------------------------------------------------------*/
 
 
-#define DO_INIT()					/* Initialize port for MMC DO as input */
-#define DO			P1->OUT & 0x01	/* Test for MMC DO ('H':true, 'L':false) */
+#define DO_INIT()			/* Initialize port for MMC DO as input */
+#define DO		P1->OUT & 0x01	/* Test for MMC DO ('H':true, 'L':false) */
 
 #define DI_INIT()\	
 {\
 P1->SEL0 |= BIT6;\
 P1->SEL1 &= BIT6;\	/* Initialize port for MMC DI as output */
 }
-#define DI_H()		P1->OUT |= BIT6	/* Set MMC DI "high" */
+#define DI_H()		P1->OUT |= BIT6		/* Set MMC DI "high" */
 #define DI_L()		P1->OUT &= ~BIT6	/* Set MMC DI "low" */
 
 #define CK_INIT()\	
@@ -53,7 +53,7 @@ P1->SEL1 &= BIT6;\	/* Initialize port for MMC DI as output */
 P1->SEL0 |= BIT5;\
 P1->SEL1 &= ~BIT5;\	/* Initialize port for MMC SCLK as output */
 }
-#define CK_H()		P1->OUT |= BIT5	/* Set MMC SCLK "high" */
+#define CK_H()		P1->OUT |= BIT5		/* Set MMC SCLK "high" */
 #define	CK_L()		P1->OUT &= ~BIT5	/* Set MMC SCLK "low" */
 
 #define CS_INIT()\
@@ -61,7 +61,7 @@ P1->SEL1 &= ~BIT5;\	/* Initialize port for MMC SCLK as output */
 P1->SEL0 |= BIT4;\
 P1->SEL1 &= ~BIT4;\	/* Initialize port for MMC CS as output */
 }
-#define	CS_H()		P1->OUT |= BIT5	/* Set MMC CS "high" */
+#define	CS_H()		P1->OUT |= BIT5		/* Set MMC CS "high" */
 #define CS_L()		P1->OUT &= ~BIT5	/* Set MMC CS "low" */
 
 
@@ -72,11 +72,11 @@ P1->SEL1 &= ~BIT4;\	/* Initialize port for MMC CS as output */
 ---------------------------------------------------------------------------*/
 
 /* MMC/SD command (SPI mode) */
-#define CMD0	(0)			/* GO_IDLE_STATE */
-#define CMD1	(1)			/* SEND_OP_COND */
+#define CMD0	(0)		/* GO_IDLE_STATE */
+#define CMD1	(1)		/* SEND_OP_COND */
 #define	ACMD41	(0x80+41)	/* SEND_OP_COND (SDC) */
-#define CMD8	(8)			/* SEND_IF_COND */
-#define CMD9	(9)			/* SEND_CSD */
+#define CMD8	(8)		/* SEND_IF_COND */
+#define CMD9	(9)		/* SEND_CSD */
 #define CMD10	(10)		/* SEND_CID */
 #define CMD12	(12)		/* STOP_TRANSMISSION */
 #define CMD13	(13)		/* SEND_STATUS */
@@ -110,7 +110,7 @@ BYTE CardType;			/* b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing */
 static
 void xmit_mmc (
 	const BYTE* buff,	/* Data to be sent */
-	UINT bc				/* Number of bytes to send */
+	UINT bc			/* Number of bytes to send */
 )
 {
 	BYTE d;
@@ -171,7 +171,7 @@ void rcvr_mmc (
 		CK_H(); CK_L();
 		r <<= 1; if (DO) r++;	/* bit0 */
 		CK_H(); CK_L();
-		*buff++ = r;			/* Store a received byte */
+		*buff++ = r;		/* Store a received byte */
 	} while (--bc);
 }
 
@@ -208,7 +208,7 @@ void deselect (void)
 {
 	BYTE d;
 
-	CS_H();				/* Set CS# high */
+	CS_H();			/* Set CS# high */
 	rcvr_mmc(&d, 1);	/* Dummy clock (force DO hi-z for multiple slave SPI) */
 }
 
@@ -224,7 +224,7 @@ int select (void)	/* 1:OK, 0:Timeout */
 	BYTE d;
 
 	CS_L();				/* Set CS# low */
-	rcvr_mmc(&d, 1);	/* Dummy clock (force DO enabled) */
+	rcvr_mmc(&d, 1);		/* Dummy clock (force DO enabled) */
 	if (wait_ready()) return 1;	/* Wait for card ready */
 
 	deselect();
@@ -255,9 +255,9 @@ int rcvr_datablock (	/* 1:OK, 0:Failed */
 	if (d[0] != 0xFE) return 0;		/* If not valid data token, return with error */
 
 	rcvr_mmc(buff, btr);			/* Receive the data block into buffer */
-	rcvr_mmc(d, 2);					/* Discard CRC */
+	rcvr_mmc(d, 2);				/* Discard CRC */
 
-	return 1;						/* Return with success */
+	return 1;				/* Return with success */
 }
 
 
@@ -269,7 +269,7 @@ int rcvr_datablock (	/* 1:OK, 0:Failed */
 static
 int xmit_datablock (	/* 1:OK, 0:Failed */
 	const BYTE *buff,	/* 512 byte data block to be transmitted */
-	BYTE token			/* Data/Stop token */
+	BYTE token		/* Data/Stop token */
 )
 {
 	BYTE d[2];
@@ -278,7 +278,7 @@ int xmit_datablock (	/* 1:OK, 0:Failed */
 	if (!wait_ready()) return 0;
 
 	d[0] = token;
-	xmit_mmc(d, 1);				/* Xmit a token */
+	xmit_mmc(d, 1);			/* Xmit a token */
 	if (token != 0xFD) {		/* Is it data token? */
 		xmit_mmc(buff, 512);	/* Xmit the 512 byte data block to MMC */
 		rcvr_mmc(d, 2);			/* Xmit dummy CRC (0xFF,0xFF) */
@@ -298,8 +298,8 @@ int xmit_datablock (	/* 1:OK, 0:Failed */
 
 static
 BYTE send_cmd (		/* Returns command response (bit7==1:Send failed)*/
-	BYTE cmd,		/* Command byte */
-	DWORD arg		/* Argument */
+	BYTE cmd,	/* Command byte */
+	DWORD arg	/* Argument */
 )
 {
 	BYTE n, d, buf[6];
@@ -322,8 +322,8 @@ BYTE send_cmd (		/* Returns command response (bit7==1:Send failed)*/
 	buf[1] = (BYTE)(arg >> 24);		/* Argument[31..24] */
 	buf[2] = (BYTE)(arg >> 16);		/* Argument[23..16] */
 	buf[3] = (BYTE)(arg >> 8);		/* Argument[15..8] */
-	buf[4] = (BYTE)arg;				/* Argument[7..0] */
-	n = 0x01;						/* Dummy CRC + Stop */
+	buf[4] = (BYTE)arg;			/* Argument[7..0] */
+	n = 0x01;				/* Dummy CRC + Stop */
 	if (cmd == CMD0) n = 0x95;		/* (valid CRC for CMD0(0)) */
 	if (cmd == CMD8) n = 0x87;		/* (valid CRC for CMD8(0x1AA)) */
 	buf[5] = n;
@@ -331,7 +331,7 @@ BYTE send_cmd (		/* Returns command response (bit7==1:Send failed)*/
 
 	/* Receive command response */
 	if (cmd == CMD12) rcvr_mmc(&d, 1);	/* Skip a stuff byte when stop reading */
-	n = 10;								/* Wait for a valid response in timeout of 10 attempts */
+	n = 10;					/* Wait for a valid response in timeout of 10 attempts */
 	do
 		rcvr_mmc(&d, 1);
 	while ((d & 0x80) && --n);
@@ -353,7 +353,7 @@ BYTE send_cmd (		/* Returns command response (bit7==1:Send failed)*/
 /*-----------------------------------------------------------------------*/
 
 DSTATUS disk_status (
-	BYTE drv			/* Drive number (always 0) */
+	BYTE drv	/* Drive number (always 0) */
 )
 {
 	if (drv) return STA_NOINIT;
@@ -389,9 +389,9 @@ DSTATUS disk_initialize (
 	ty = 0;
 	if (send_cmd(CMD0, 0) == 1) {			/* Enter Idle state */
 		if (send_cmd(CMD8, 0x1AA) == 1) {	/* SDv2? */
-			rcvr_mmc(buf, 4);							/* Get trailing return value of R7 resp */
+			rcvr_mmc(buf, 4);				/* Get trailing return value of R7 resp */
 			if (buf[2] == 0x01 && buf[3] == 0xAA) {		/* The card can work at vdd range of 2.7-3.6V */
-				for (tmr = 1000; tmr; tmr--) {			/* Wait for leaving idle state (ACMD41 with HCS bit) */
+				for (tmr = 1000; tmr; tmr--) {		/* Wait for leaving idle state (ACMD41 with HCS bit) */
 					if (send_cmd(ACMD41, 1UL << 30) == 0) break;
 					dly_us(1000);
 				}
@@ -400,13 +400,13 @@ DSTATUS disk_initialize (
 					ty = (buf[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;	/* SDv2 */
 				}
 			}
-		} else {							/* SDv1 or MMCv3 */
+		} else {					/* SDv1 or MMCv3 */
 			if (send_cmd(ACMD41, 0) <= 1) 	{
 				ty = CT_SD1; cmd = ACMD41;	/* SDv1 */
 			} else {
 				ty = CT_MMC; cmd = CMD1;	/* MMCv3 */
 			}
-			for (tmr = 1000; tmr; tmr--) {			/* Wait for leaving idle state */
+			for (tmr = 1000; tmr; tmr--) {		/* Wait for leaving idle state */
 				if (send_cmd(cmd, 0) == 0) break;
 				dly_us(1000);
 			}
@@ -430,10 +430,10 @@ DSTATUS disk_initialize (
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_read (
-	BYTE drv,			/* Physical drive nmuber (0) */
-	BYTE *buff,			/* Pointer to the data buffer to store read data */
+	BYTE drv,		/* Physical drive nmuber (0) */
+	BYTE *buff,		/* Pointer to the data buffer to store read data */
 	DWORD sector,		/* Start sector number (LBA) */
-	UINT count			/* Sector count (1..128) */
+	UINT count		/* Sector count (1..128) */
 )
 {
 	BYTE cmd;
@@ -442,7 +442,7 @@ DRESULT disk_read (
 	if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
 	if (!(CardType & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
 
-	cmd = count > 1 ? CMD18 : CMD17;			/*  READ_MULTIPLE_BLOCK : READ_SINGLE_BLOCK */
+	cmd = count > 1 ? CMD18 : CMD17;		/*  READ_MULTIPLE_BLOCK : READ_SINGLE_BLOCK */
 	if (send_cmd(cmd, sector) == 0) {
 		do {
 			if (!rcvr_datablock(buff, 512)) break;
@@ -462,10 +462,10 @@ DRESULT disk_read (
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_write (
-	BYTE drv,			/* Physical drive nmuber (0) */
+	BYTE drv,		/* Physical drive nmuber (0) */
 	const BYTE *buff,	/* Pointer to the data to be written */
 	DWORD sector,		/* Start sector number (LBA) */
-	UINT count			/* Sector count (1..128) */
+	UINT count		/* Sector count (1..128) */
 )
 {
 	if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
