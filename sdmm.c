@@ -36,7 +36,12 @@
 /*-------------------------------------------------------------------------*/
 
 
-#define DO_INIT()                   /* Initialize port for MMC DO as input */
+#define DO_INIT()\
+{\
+P1->SEL0 |= BIT7;\
+P1->SEL1 &= ~BIT7;\
+}
+/* Initialize port for MMC DO as input */
 #define DO          P1->OUT & 0x01  /* Test for MMC DO ('H':true, 'L':false) */
 
 #define DI_INIT()\  
