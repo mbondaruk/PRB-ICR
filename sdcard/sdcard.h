@@ -11,7 +11,14 @@
 #define SD_CMD12_STOP_TRANS 0x0 //stop trans in multiblock read
 #define SD_CMD13_SEND_STATUS 0x0 //ask for status register
 #define SD_CMD16_SET_BLOCKLEN //unused in SDHC/XC
-
+#define WRITE_SPI(data) {\
+   while(!EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG);\
+   EUSCI_B0->TXBUF = hiByte;\
+}
+#define RECEIVE_SPI() {\
+   while(!EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG);\
+   return EUSCI_B0->RXBUF;
+}
 void sdWriteBlock(uint32_t address);
 void sdWriteMultipleBlocks(uint32_t address);
 void sdReadBlock(uint32_t address, uint8_t *buf);

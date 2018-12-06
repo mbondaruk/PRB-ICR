@@ -17,14 +17,7 @@
 #define CMD25  (0x40+25)   /* WRITE_MULTIPLE_BLOCK */
 #define CMD55  (0x40+55)   /* APP_CMD */
 #define CMD58  (0x40+58)   /* READ_OCR */
-#define WRITE_SPI(data) {\
-   while(!EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG);\
-   EUSCI_B0->TXBUF = hiByte;\
-}
-#define RECEIVE_SPI() {\
-   while(!EUSCI_B0->IFG & EUSCI_B_IFG_TXIFG);\
-   return EUSCI_B0->RXBUF;
-}
+
 
 typedef struct descriptor {
    uint32_t CID[4]; //card identification number
