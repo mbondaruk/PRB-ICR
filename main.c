@@ -57,6 +57,113 @@ void main(void)
         }
     }
 }
+int init_sequence2()
+{
+    BYTE i, response = 255;
+    BYTE response1, response2, response3, response4, response5;
+
+    DL_H();
+    CS_H();
+    delay_us(45000); //ramp up Vdata + stabilize V
+
+    //initialize_timer3(); //initialization timeout
+    //initialize_timer2();
+    for(i = 0; i < 10; i++)
+    {
+        write_spi(0xff);
+    }
+
+    while(response == 255)
+    {
+        CS_L();
+
+        write_spi(0x40);
+        write_spi(0);
+        write_spi(0);
+        write_spi(0);
+        write_spi(0);
+        write_spi(0x95);
+        write_spi(0xff);
+        response = receive_spi();
+        response1 = receive_spi();
+        response2 = receive_spi();
+        response3 = receive_spi();
+        response4 = receive_spi();
+        response5 = receive_spi();
+        CS_H();
+    }
+
+    response = 255;
+
+    while(response == 255)
+    {
+        CS_L();
+
+        write_spi(0x48);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x1);
+        write_spi(0xAA);
+        write_spi(0x87);
+        write_spi(0xff);
+        //response = receive_spi();
+        response  = receive_spi();
+        response1 = receive_spi();
+        response2 = receive_spi();
+        response3 = receive_spi();
+        response4 = receive_spi();
+        response5 = receive_spi();
+        CS_H();
+    }
+    //works up to here
+    while(response == 1 || response == 255)
+    {
+        CS_L();
+        delay_us(100);
+        write_spi(0x77);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x65);
+        write_spi(0xff);
+        response = receive_spi();
+
+        CS_H();
+        delay_us(100);
+
+        CS_L();
+        delay_us(100);
+        write_spi(0x69);
+        write_spi(0x40);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x77);
+        write_spi(0xff);
+        response  = receive_spi();
+
+        CS_H();
+        delay_us(100);
+    }
+
+
+    /*send_cmd(cmd0);
+    if(response[0] != 1 || response_timeout)
+        return 1;
+    send_cmd(cmd8);
+    if(response[0] != 1 || response_timeout)
+        return 1;
+    while(response[0] == 1)
+    {
+        send_cmd(cmd55);
+        send_cmd(acmd41);
+    }
+    if(response[0] == 0)
+        return 0;*/
+    return 1;
+
+}
 int init_sequence1()
 {
     BYTE i, response = 255;
@@ -115,7 +222,33 @@ int init_sequence1()
         response5 = receive_spi();
         CS_H();
     }
+    //works up to here
+    while(response != 0)
+    {
+        CS_L();
+        delay_us(100);
+        write_spi(0x77);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x65);
+        write_spi(0xff);
+        response = receive_spi();
 
+
+        write_spi(0x69);
+        write_spi(0x40);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x0);
+        write_spi(0x77);
+        write_spi(0xff);
+        response  = receive_spi();
+
+        CS_H();
+        delay_us(100);
+    }
 
 
     /*send_cmd(cmd0);
